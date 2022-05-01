@@ -43,10 +43,12 @@ class Car {
 
   plot = function() {
     var car = this;
-    var x = (car.distance % line_width) / line_width;
-    var y = Math.floor(car.distance / line_width) / lines;
-    car.el.css('top', y * 100 + '%');
-    car.el.css('left', x * 100 + '%');
+    var x = (car.distance % line_width) / line_width; // 0 - 1
+    var line = Math.floor(car.distance / line_width); // 0 - 5
+    var y = line / lines; // 0 - 1
+    if (line % 2) { x = 1 - x; }
+    car.el.css('left', x * 100  + '%');
+    car.el.css('top', (y * 100 + 10) + '%');
     //console.log("x=" + x + " y=" + y + ' speed=' + this.speed);
   }
 }
@@ -97,17 +99,14 @@ function tick() {
     // calculate the new speed and distance for each car
     car.tick(idx);
     car.plot();
+  });
 
-    // car is finished so remove from the lane
-    if (car.distance > total_distance) {
-      lanes.pop(car);
-      console.log("Car finished");
-    }
+  // remove all cars that have finished.
+  lanes = _.filter(lanes, function(car) { return (car.distance < total_distance); });
 
-    if (!lanes.length) {
-      stop();
-    }
-  })
+  if (!lanes.length) {
+    stop();
+  }
 
   ticks++;
   //console.log('tick=' + ticks);
@@ -117,12 +116,15 @@ var ticks = 0;
 var interval_id = null;
 
 function add_car() {
-  lanes.push(car());
+  var c = car();
+  lanes.push(c);
+  c.plot();
+  return c;
 }
 
 function start() {
-  add_car()
-  interval_id = setInterval(tick, 100)
+  add_car();
+  interval_id = setInterval(tick, 500)
 }
 
 function stop() {
