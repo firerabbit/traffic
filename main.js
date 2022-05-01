@@ -1,13 +1,16 @@
 
 class Car {
-  constructor(gas, brake) {
+  constructor(speed, gas, brake) {
+    this.distance = 0;
+    this.speed = speed;
+    this.length = 20;
     this.gas = gas;
     this.brake = brake;
   }
 }
 
 function car() {
-  return new Car(1, 2)
+  return new Car(70, 1, 2)
 }
 
 class StopLight {
@@ -49,8 +52,15 @@ var speed_limits = [
 
 var lanes = [car()];
 
+function render() {
+  _.each(lanes, function(car) {
+    plot(car)
+  })
+}
 
+function plot(car) {
 
+}
 
 
 
