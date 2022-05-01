@@ -6,7 +6,7 @@ var line_width = total_distance / lines;
 var lanes = [];
 
 function mph_to_fps(mph) {
-  return 5280 * mph / 3600;
+  return (5280 * mph) / 3600;
 }
 
 class Car {
@@ -43,10 +43,10 @@ class Car {
 
   plot = function() {
     var car = this;
-    var x = (car.distance % total_distance) / line_width;
-    var y = Math.floor(car.distance / total_distance) + 10;
-    car.el.css('top', y + '%');
-    car.el.css('left', x + '%');
+    var x = (car.distance % line_width) / line_width;
+    var y = Math.floor(car.distance / line_width) / lines;
+    car.el.css('top', y * 100 + '%');
+    car.el.css('left', x * 100 + '%');
     //console.log("x=" + x + " y=" + y + ' speed=' + this.speed);
   }
 }
@@ -97,6 +97,16 @@ function tick() {
     // calculate the new speed and distance for each car
     car.tick(idx);
     car.plot();
+
+    // car is finished so remove from the lane
+    if (car.distance > total_distance) {
+      lanes.pop(car);
+      console.log("Car finished");
+    }
+
+    if (!lanes.length) {
+      stop();
+    }
   })
 
   ticks++;
@@ -112,7 +122,7 @@ function add_car() {
 
 function start() {
   add_car()
-  interval_id = setInterval(tick, 200)
+  interval_id = setInterval(tick, 100)
 }
 
 function stop() {
