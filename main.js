@@ -74,6 +74,7 @@ class SpeedLimit {
     // associate this class with a jquery el
     var el = $('#speedlimit').clone();
     el.attr('id', '');
+    el.html(this.speed_limit);
     el.appendTo('#canvas');
     this.el = el;
 
