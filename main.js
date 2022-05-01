@@ -2,8 +2,9 @@
 var total_distance = 5000;
 var lines = 5;
 var line_width = total_distance / lines;
-
 var lanes = [];
+var lights;
+var speed_limits;
 
 function mph_to_fps(mph) {
   return (5280 * mph) / 3600;
@@ -52,6 +53,12 @@ class StopLight {
     this.distance = distance;
     this.green_duration = green;
     this.red_duration = red;
+
+    // associate this class with a jquery el
+    var el = $('#light').clone();
+    el.attr('id', '');
+    el.appendTo('#canvas');
+    this.el = el;
   }
 }
 
@@ -63,6 +70,13 @@ class SpeedLimit {
   constructor(distance, speed_limit) {
     this.distance = distance;
     this.speed_limit = speed_limit;
+
+    // associate this class with a jquery el
+    var el = $('#speedlimit').clone();
+    el.attr('id', '');
+    el.appendTo('#canvas');
+    this.el = el;
+
   }
 }
 
@@ -70,19 +84,6 @@ function speed_limit(d, limit) {
   return new SpeedLimit(d, limit);
 }
 
-var lights = [
-  light(100),
-  light(1000),
-  light(2000),
-];
-
-var speed_limits = [
-  speed_limit(0, 70),
-  speed_limit(400, 50),
-  speed_limit(1100, 35),
-  speed_limit(2500, 40),
-  speed_limit(3000, 55),
-];
 
 function tick() {
   _.each(lanes, function(car, idx) {
@@ -112,7 +113,30 @@ function add_car() {
   return c;
 }
 
+var initialized = false;
+
+function init() {
+  if (initialized) return;
+
+  lights = [
+    light(100),
+    light(1000),
+    light(2000),
+  ];
+
+  speed_limits = [
+    speed_limit(0, 70),
+    speed_limit(400, 50),
+    speed_limit(1100, 35),
+    speed_limit(2500, 40),
+    speed_limit(3000, 55),
+  ];
+
+  _.each(lights.concat(speed_limits), function(i) { plot(i)});
+}
+
 function start() {
+  init();
   add_car();
   interval_id = setInterval(tick, 500)
 }

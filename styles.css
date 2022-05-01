@@ -17,14 +17,19 @@ body {
   height: 20px;
   border-radius: 10px;
   background-color: green;
+  position: absolute;
+  transition: all 0.5s linear;
 }
 
 .speedlimit {
   width: 25px;
-  height: 40px;
+  height: 35px;
   border: black 1px solid;
+  background-color: white;
   text-align: center;
   padding: 5px 0;
+  position: absolute;
+  transition: all 0.5s linear;
 }
 
 #canvas {
