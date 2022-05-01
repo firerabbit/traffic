@@ -1,4 +1,8 @@
 
+var total_distance = 5000;
+var lines = 5;
+var line_width = total_distance / lines;
+
 class Car {
   constructor(speed, gas, brake) {
     this.distance = 0;
@@ -6,11 +10,25 @@ class Car {
     this.length = 20;
     this.gas = gas;
     this.brake = brake;
+
+    var el = $('#car').clone();
+    el.attr('id', '');
+    el.appendTo('#canvas');
+    this.el = el;
+  };
+
+  plot = function() {
+    var car = this;
+    var x = (car.distance % total_distance) / line_width;
+    var y = Math.floor(car.distance / total_distance);
+    car.el.css('top', y + '%');
+    car.el.css('left', y + '%');
+    console.log("x=" + x + " y=" + y + ' speed=' + this.speed);
   }
 }
 
 function car() {
-  return new Car(70, 1, 2)
+  return new Car(70, 1, 2);
 }
 
 class StopLight {
@@ -50,7 +68,7 @@ var speed_limits = [
   speed_limit(3000, 55),
 ];
 
-var lanes = [car()];
+var lanes = [];
 
 function render() {
   _.each(lanes, function(car) {
@@ -58,9 +76,7 @@ function render() {
   })
 }
 
-function plot(car) {
 
-}
 
 
 

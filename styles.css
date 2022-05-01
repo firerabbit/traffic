@@ -1,8 +1,14 @@
 
+body {
+  margin: 0;
+  padding: 0;
+}
+
 .car {
   background-color: grey;
   width: 20px;
   height: 8px;
+  position: absolute;
 }
 
 .light {
