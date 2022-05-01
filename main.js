@@ -119,6 +119,7 @@ function start() {
 
 function stop() {
   clearInterval(interval_id);
+  console.log("Stopped!");
 }
 
 
