@@ -1,0 +1,21 @@
+
+.car {
+  background-color: grey;
+  width: 20px;
+  height: 8px;
+}
+
+.light {
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background-color: green;
+}
+
+.speedlimit {
+  width: 25px;
+  height: 40px;
+  border: black 1px solid;
+  text-align: center;
+  padding: 5px 0;
+}
