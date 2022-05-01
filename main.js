@@ -20,10 +20,11 @@ class Car {
   plot = function() {
     var car = this;
     var x = (car.distance % total_distance) / line_width;
-    var y = Math.floor(car.distance / total_distance);
+    var y = Math.floor(car.distance / total_distance) + 10;
     car.el.css('top', y + '%');
-    car.el.css('left', y + '%');
+    car.el.css('left', x + '%');
     console.log("x=" + x + " y=" + y + ' speed=' + this.speed);
+    return this;
   }
 }
 
