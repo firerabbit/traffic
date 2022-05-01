@@ -3,6 +3,12 @@ var total_distance = 5000;
 var lines = 5;
 var line_width = total_distance / lines;
 
+var lanes = [];
+
+function mph_to_fps(mph) {
+  return 5280 * mph / 3600;
+}
+
 class Car {
   constructor(speed, gas, brake) {
     this.distance = 0;
@@ -10,12 +16,30 @@ class Car {
     this.length = 20;
     this.gas = gas;
     this.brake = brake;
+    this.speed_limit_idx = 0;
+    this.traffic_light_idx = 0;
+    this.speed_limit = speed_limits[0];
+    this.next_light = lights[0]
 
+    // associate this class with a jquery el
     var el = $('#car').clone();
     el.attr('id', '');
     el.appendTo('#canvas');
     this.el = el;
   };
+
+  tick = function(idx) {
+    // increase speed up to the limit
+
+    // don't run into cars ahead of you
+
+    // slow down if the light ahead is red
+
+    // slow down if near your destination
+
+    // update distance based on speed
+    this.distance += mph_to_fps(this.speed)
+  }
 
   plot = function() {
     var car = this;
@@ -23,8 +47,7 @@ class Car {
     var y = Math.floor(car.distance / total_distance) + 10;
     car.el.css('top', y + '%');
     car.el.css('left', x + '%');
-    console.log("x=" + x + " y=" + y + ' speed=' + this.speed);
-    return this;
+    //console.log("x=" + x + " y=" + y + ' speed=' + this.speed);
   }
 }
 
@@ -69,16 +92,32 @@ var speed_limits = [
   speed_limit(3000, 55),
 ];
 
-var lanes = [];
-
-function render() {
-  _.each(lanes, function(car) {
-    plot(car)
+function tick() {
+  _.each(lanes, function(car, idx) {
+    // calculate the new speed and distance for each car
+    car.tick(idx);
+    car.plot();
   })
+
+  ticks++;
+  //console.log('tick=' + ticks);
 }
 
+var ticks = 0;
+var interval_id = null;
 
+function add_car() {
+  lanes.push(car());
+}
 
+function start() {
+  add_car()
+  interval_id = setInterval(tick, 200)
+}
+
+function stop() {
+  clearInterval(interval_id);
+}
 
 
 
