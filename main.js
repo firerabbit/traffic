@@ -33,23 +33,49 @@ class Car {
   tick = function(idx) {
     // see if we passed a light or in a new speed limit
     this._compute_nexts()
+    var text = ''
+    var distance_to_light = '';
+    var brake_pressure = '';
 
-    // increase speed up to the limit
-    var limit = this.speed_limit.speed_limit;
-    if (this.speed > limit) {
-      this.speed = Math.max(limit, this.speed - this.brake);
+    var ticks_to_break = this.speed / this.brake;
+    var break_distance = mph_to_fps(this.speed / 2) * ticks_to_break;
+    var near_red_light = (
+      this.next_light && this.next_light.is_red() &&
+      break_distance + this.distance + 10 > this.next_light.distance)
+
+    if (near_red_light) {
+      // come to a stop in time for the light
+      distance_to_light = this.next_light.distance - this.distance;
+      brake_pressure = break_distance / distance_to_light;
+      this.speed = Math.max(0, this.speed - (brake_pressure * this.brake));
+      text = 'red';
     } else {
-      this.speed = Math.min(limit, this.speed + this.gas);
+      // start matching speed to the speed limit
+      var limit = this.speed_limit.speed_limit;
+      if (this.speed > limit) {
+        this.speed = Math.max(limit, this.speed - this.brake);
+        text = 'brake';
+      } else {
+        this.speed = Math.min(limit, this.speed + this.gas);
+        text = 'gas';
+      }
     }
 
     // don't run into cars ahead of you
 
     // slow down if the light ahead is red
 
+
     // slow down if near your destination
 
     // update distance based on speed
-    this.distance += mph_to_fps(this.speed)
+    this.distance += mph_to_fps(this.speed);
+    this.el.html(text +
+                 '<br/> speed=' + this.speed +
+                 '<br/> break=' + Math.floor(break_distance) +
+                 '<br/> light=' + Math.floor(distance_to_light) +
+                 '<br/> press=' + Math.floor(brake_pressure)
+                 );
   }
 
   _compute_nexts = function() {
@@ -81,7 +107,7 @@ class Car {
 
 function car(speed) {
   speed = speed || 70;
-  return new Car(speed, 1, 2);
+  return new Car(speed, 2, 4);
 }
 
 GREEN = 1;
@@ -113,6 +139,14 @@ class StopLight {
     }
   }
 
+  is_red = function() {
+    return this.state == RED;
+  }
+
+  is_green = function() {
+    return this.state == GREEN;
+  }
+
   tick = function() {
     if (this.state == GREEN) {
       if (this.ticks > this.green_duration) {
@@ -128,7 +162,7 @@ class StopLight {
 }
 
 function light(d) {
-  return new StopLight(d, 10, 10);
+  return new StopLight(d, 10, 30);
 }
 
 class SpeedLimit {
@@ -193,7 +227,9 @@ function init() {
 
   lights = [
     light(100),
-    light(1000),
+    light(300),
+    light(500),
+    light(900),
     light(2000),
   ];
 
