@@ -52,7 +52,7 @@ class Car {
     this.distance += mph_to_fps(this.speed)
   }
 
-  _compute_nexts() {
+  _compute_nexts = function() {
     if (this.next_limit && this.distance > this.next_limit.distance) {
       this.speed_limit_idx++;
       this.speed_limit = this.next_limit;
@@ -84,11 +84,16 @@ function car(speed) {
   return new Car(speed, 1, 2);
 }
 
+GREEN = 1;
+RED = 0;
+
 class StopLight {
   constructor(distance, green, red) {
     this.distance = distance;
     this.green_duration = green;
     this.red_duration = red;
+    this.state = GREEN;
+    this.ticks = Math.floor(Math.random() * green);
 
     // associate this class with a jquery el
     var el = $('#light').clone();
@@ -96,10 +101,34 @@ class StopLight {
     el.appendTo('#canvas');
     this.el = el;
   }
+
+  toggle = function() {
+    this.ticks = 0;
+    if (this.state == GREEN) {
+      this.state = RED;
+      this.el.css('background-color', 'red');
+    } else {
+      this.state = GREEN;
+      this.el.css('background-color', 'green');
+    }
+  }
+
+  tick = function() {
+    if (this.state == GREEN) {
+      if (this.ticks > this.green_duration) {
+        this.toggle();
+      }
+    } else {
+      if (this.ticks > this.red_duration) {
+        this.toggle();
+      }
+    }
+    this.ticks++;
+  }
 }
 
 function light(d) {
-  return new StopLight(d, 30, 30);
+  return new StopLight(d, 10, 10);
 }
 
 class SpeedLimit {
@@ -123,6 +152,12 @@ function speed_limit(d, limit) {
 
 
 function tick() {
+  // tick lights
+  _.each(lights, function(light) {
+    light.tick();
+  })
+
+  // tick cars
   _.each(lanes, function(car, idx) {
     // calculate the new speed and distance for each car
     car.tick(idx);
@@ -136,6 +171,7 @@ function tick() {
     stop();
   }
 
+  $('#ticks').html(ticks);
   ticks++;
   //console.log('tick=' + ticks);
 }
@@ -173,6 +209,7 @@ function init() {
 }
 
 function start() {
+  if (lanes.length) { console.log("already started"); return; }
   init();
   add_car();
   interval_id = setInterval(tick, 500)

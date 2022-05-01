@@ -4,12 +4,22 @@ body {
   padding: 0;
 }
 
+#ticks {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  padding: 10px;
+}
+
+.item {
+  position: absolute;
+  transition: all 0.5s linear;
+}
+
 .car {
   background-color: grey;
   width: 20px;
   height: 8px;
-  position: absolute;
-  transition: all 0.5s linear;
 }
 
 .light {
@@ -17,8 +27,7 @@ body {
   height: 20px;
   border-radius: 10px;
   background-color: green;
-  position: absolute;
-  transition: all 0.5s linear;
+  transform: translate(-10px, -10px) scale(2);
 }
 
 .speedlimit {
@@ -28,8 +37,6 @@ body {
   background-color: white;
   text-align: center;
   padding: 5px 0;
-  position: absolute;
-  transition: all 0.5s linear;
 }
 
 #canvas {
