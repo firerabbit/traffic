@@ -21,6 +21,7 @@ class Car {
     this.traffic_light_idx = 0;
     this.speed_limit = speed_limits[0];
     this.next_light = lights[0]
+    this.next_limit = speed_limits[1];
 
     // associate this class with a jquery el
     var el = $('#car').clone();
@@ -30,7 +31,16 @@ class Car {
   };
 
   tick = function(idx) {
+    // see if we passed a light or in a new speed limit
+    this._compute_nexts()
+
     // increase speed up to the limit
+    var limit = this.speed_limit.speed_limit;
+    if (this.speed > limit) {
+      this.speed = Math.max(limit, this.speed - this.brake);
+    } else {
+      this.speed = Math.min(limit, this.speed + this.gas);
+    }
 
     // don't run into cars ahead of you
 
@@ -42,10 +52,36 @@ class Car {
     this.distance += mph_to_fps(this.speed)
   }
 
+  _compute_nexts() {
+    if (this.next_limit && this.distance > this.next_limit.distance) {
+      this.speed_limit_idx++;
+      this.speed_limit = this.next_limit;
+      this.next_limit = speed_limits[next_idx]
+      var next_idx = this.speed_limit_idx+1
+      if (next_idx >= speed_limits.length) {
+        this.next_limit = null
+      } else {
+        this.next_limit = speed_limits[next_idx]
+        console.log("new limit!")
+      }
+    }
+
+    if (this.next_light && this.distance > this.next_light.distance) {
+      this.traffic_light_idx++;
+      if (this.traffic_light_idx >= lights.length) {
+        this.next_light = null
+      } else {
+        this.next_light = lights[this.traffic_light_idx]
+        console.log("new light!")
+      }
+    }
+  }
+
 }
 
-function car() {
-  return new Car(70, 1, 2);
+function car(speed) {
+  speed = speed || 70;
+  return new Car(speed, 1, 2);
 }
 
 class StopLight {
@@ -108,7 +144,7 @@ var ticks = 0;
 var interval_id = null;
 
 function add_car() {
-  var c = car();
+  var c = car(10);
   lanes.push(c);
   plot(c);
   return c;
