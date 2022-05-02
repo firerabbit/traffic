@@ -1,10 +1,12 @@
 
-var total_distance = 5000;
+var total_distance = 3100;
 var lines = 5;
 var line_width = total_distance / lines;
 var lane = [];
 var lights;
 var speed_limits;
+
+TRAFFIC = 0.2;
 
 function mph_to_fps(mph) {
   return (5280 * mph) / 3600;
@@ -192,10 +194,13 @@ class SpeedLimit {
     // associate this class with a jquery el
     var el = $('#speedlimit').clone();
     el.attr('id', '');
-    el.html(this.speed_limit);
     el.appendTo('#canvas');
     this.el = el;
+    this.render();
+  }
 
+  render = function() {
+    this.el.html(this.speed_limit);
   }
 }
 
@@ -238,7 +243,7 @@ function tick() {
 
   var first_car = _.last(lane)
   if (first_car.distance > 100) {
-    if (Math.random() < 0.2) {
+    if (Math.random() < TRAFFIC) {
       add_car();
     }
   }
@@ -246,7 +251,7 @@ function tick() {
   $('#ticks').html(
     'ticks=' + ticks +
     ' num=' + stats.current.num +
-    ' avg=' + stats.current.avg);
+    ' avg=' + Math.floor(stats.current.avg));
 
   ticks++;
   //console.log('tick=' + ticks);
@@ -268,20 +273,25 @@ function init() {
   if (initialized) return;
 
   lights = [
-    light(200),
+    light(400),
     light(1500),
     light(2600),
   ];
 
   speed_limits = [
     speed_limit(0, 70),
-    speed_limit(800, 50),
+    speed_limit(600, 50),
     speed_limit(1700, 35),
     speed_limit(3000, 40),
     speed_limit(4000, 55),
   ];
 
+  replot();
+}
+
+function replot() {
   _.each(lights.concat(speed_limits), function(i) { plot(i)});
+  _.each(speed_limits, function(i) { i.render(); });
 }
 
 function start() {
