@@ -257,7 +257,7 @@ class Destination {
     this.distance = distance;
     this.duration = duration;
     this.weight = weight;
-    this.entry_speed = 1;
+    this.entry_speed = 10;
     this.color = 'blue';
 
     // associate this class with a jquery el
@@ -303,7 +303,9 @@ function tick() {
     plot(car);
 
     if (car.finished()) {
-      update_stats(ticks - car.start_tick);
+      if (!car.destination) {
+        update_stats(ticks - car.start_tick);
+      }
       car.destroy();
     }
   });
@@ -361,7 +363,7 @@ function init() {
   ];
 
   destinations = [
-    destination('stripes', 1200, 300, 0.5),
+    destination('stripes', 1500, 300, 0.5),
   ]
 
   replot();
