@@ -27,6 +27,7 @@ class Car {
     this.next_light = lights[0]
     this.next_limit = speed_limits[1];
     this.text = '';
+    this.destination = null;
 
     // associate this class with a jquery el
     var el = $('#car').clone();
@@ -34,6 +35,12 @@ class Car {
     el.appendTo('#canvas');
     this.el = el;
     this.text_el = el.children();
+
+    // Give each car some random destination
+    if (Math.random() < 0.1) {
+      this.destination = destinations[0];
+      this.el.css('background-color', this.destination.color);
+    }
   };
 
   tick = function(idx) {
@@ -72,7 +79,7 @@ class Car {
       var speed_to_slow = this.speed - this.destination.entry_speed;
       var exit_ticks_to_break = speed_to_slow / this.brake;
       var avg_speed = (speed_to_slow / 2) + this.destination.entry_speed;
-      var distance_needed_to_exit = mph_to_fps(avg_speed) * ticks_to_break;
+      var break_distance = mph_to_fps(avg_speed) * exit_ticks_to_break;
       brake_pressure = break_distance / distance_to_dest;
       this.speed = Math.max(this.destination.entry_speed, this.speed - (brake_pressure * this.brake));
       this.text = 'dest'
@@ -245,6 +252,7 @@ class Destination {
     this.distance = distance;
     this.duration = duration;
     this.entry_speed = 15;
+    this.color = 'yellow';
 
     // associate this class with a jquery el
     var el = $('#destination').clone();
@@ -290,7 +298,7 @@ function tick() {
 
     if (car.finished()) {
       update_stats(ticks - car.start_tick);
-      car.destroy()
+      car.destroy();
     }
   });
 
@@ -347,14 +355,14 @@ function init() {
   ];
 
   destinations = [
-    destination('stripes', 900, 300),
+    destination('stripes', 1200, 300),
   ]
 
   replot();
 }
 
 function replot() {
-  _.each(lights.concat(speed_limits), function(i) { plot(i)});
+  _.each(lights.concat(speed_limits).concat(destinations), function(i) { plot(i)});
   _.each(speed_limits, function(i) { i.render(); });
 }
 
