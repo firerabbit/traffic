@@ -13,13 +13,17 @@ body {
 
 .item {
   position: absolute;
-  transition: all 0.5s linear;
+  transition: all 0.1s linear;
 }
 
 .car {
-  background-color: grey;
+  background-color: purple;
+  border: black 1px solid;
+  text-align: center;
+  color: white;
   width: 20px;
-  height: 20px;
+  height: 40px;
+  padding: 2px;
   transform: translate(-20px, 0px);
 }
 
@@ -28,7 +32,7 @@ body {
   height: 20px;
   border-radius: 10px;
   background-color: green;
-  transform: translate(-10px, -10px) scale(2);
+  transform: translate(-10px, -40px) scale(2);
 }
 
 .speedlimit {
@@ -38,11 +42,10 @@ body {
   background-color: white;
   text-align: center;
   padding: 5px 0;
+  transform: translate(-12px, -55px);
 }
 
 #canvas {
-  background-color: #eee;
-  opacity: 0.5;
   position: fixed;
   left: 20px;
   right: 20px;

@@ -89,12 +89,16 @@ class Car {
     // update distance based on speed
     this.distance += mph_to_fps(this.speed);
 
+
+    this.el.html(text + '<br/>' + Math.floor(this.speed));
+    /*
     this.el.html(text +
                  '<br/> speed=' + Math.floor(this.speed) +
                  '<br/> break=' + Math.floor(break_distance) +
                  '<br/> light=' + Math.floor(distance_to_light) +
-                 '<br/> press=' + Math.floor(brake_pressure)
-                 );
+                 '<br/> press=' + Math.floor(brake_pressure) +
+                 '');
+     */
   }
 
   _compute_nexts = function() {
@@ -245,7 +249,8 @@ function init() {
     light(300),
     light(500),
     light(900),
-    light(2000),
+    light(1800),
+    light(2600),
   ];
 
   speed_limits = [
@@ -263,7 +268,7 @@ function start() {
   if (lane.length) { console.log("already started"); return; }
   init();
   add_car();
-  interval_id = setInterval(tick, 500)
+  interval_id = setInterval(tick, 100)
 }
 
 function stop() {
