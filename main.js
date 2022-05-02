@@ -50,9 +50,9 @@ class Car {
     var safe_distance;
 
     if (next_car) {
-      distance_to_car = next_car.distance - this.distance - next_car.length;
+      distance_to_car = next_car.distance - this.distance - next_car.length - 20;
       safe_distance = 2 * mph_to_fps(next_car.speed) + 5;
-      near_car = safe_distance < distance_to_car || break_distance + 10 > distance_to_car;
+      near_car = safe_distance > distance_to_car || break_distance + 10 > distance_to_car;
     }
 
     if (near_car) {
