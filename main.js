@@ -4,6 +4,7 @@ var lines = 5;
 var line_width = total_distance / lines;
 var lane = [];
 var lights;
+var destinations;
 var speed_limits;
 
 TRAFFIC = 0.2;
@@ -51,8 +52,15 @@ class Car {
 
     var next_car = lane[idx - 1];
     var near_car = false;
+    var near_dest = false;
     var distance_to_car;
+    var distance_to_dest
     var safe_distance;
+
+    if (this.destination) {
+      distance_to_dest = this.destination.distance - this.distance;
+      near_dest = break_distance > distance_to_dest;
+    }
 
     if (next_car) {
       distance_to_car = next_car.distance - this.distance - next_car.length - 10;
@@ -60,7 +68,15 @@ class Car {
       near_car = safe_distance > distance_to_car || break_distance + 10 > distance_to_car;
     }
 
-    if (near_car) {
+    if (near_dest) {
+      var speed_to_slow = this.speed - this.destination.entry_speed;
+      var exit_ticks_to_break = speed_to_slow / this.brake;
+      var avg_speed = (speed_to_slow / 2) + this.destination.entry_speed;
+      var distance_needed_to_exit = mph_to_fps(avg_speed) * ticks_to_break;
+      brake_pressure = break_distance / distance_to_dest;
+      this.speed = Math.max(this.destination.entry_speed, this.speed - (brake_pressure * this.brake));
+      this.text = 'dest'
+    } else if (near_car) {
       if (this.speed > next_car.speed) {
         brake_pressure = break_distance / distance_to_car;
         this.speed = Math.max(next_car.speed, this.speed - (brake_pressure * this.brake));
@@ -104,6 +120,14 @@ class Car {
                  '<br/> press=' + Math.floor(brake_pressure) +
                  '');
      */
+  }
+
+  finished = function() {
+    if (this.destination) {
+      return this.distance > this.destination.distance;
+    }
+
+    return this.distance > total_distance;
   }
 
   render = function() {
@@ -215,6 +239,30 @@ function speed_limit(d, limit) {
   return new SpeedLimit(d, limit);
 }
 
+class Destination {
+  constructor(name, distance, duration) {
+    this.name = name;
+    this.distance = distance;
+    this.duration = duration;
+    this.entry_speed = 15;
+
+    // associate this class with a jquery el
+    var el = $('#destination').clone();
+    el.attr('id', '');
+    el.appendTo('#canvas');
+    this.el = el;
+    this.render();
+  }
+
+  render = function() {
+    this.el.html(this.name);
+  }
+}
+
+function destination(name, distance, duration) {
+  return new Destination(name, distance, duration);
+}
+
 var stats = {'current': {'num': 0, 'avg': 0.0}};
 
 function reset_stats() {
@@ -240,7 +288,7 @@ function tick() {
     car.tick(idx);
     plot(car);
 
-    if (car.distance > total_distance) {
+    if (car.finished()) {
       update_stats(ticks - car.start_tick);
       car.destroy()
     }
@@ -297,6 +345,10 @@ function init() {
     speed_limit(3500, 40),
     speed_limit(4500, 55),
   ];
+
+  destinations = [
+    destination('stripes', 900, 300),
+  ]
 
   replot();
 }
