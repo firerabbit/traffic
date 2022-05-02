@@ -13,6 +13,7 @@ function mph_to_fps(mph) {
 class Car {
   constructor(speed, gas, brake) {
     this.distance = 0;
+    this.start_tick = ticks;
     this.speed = speed;
     this.length = 20;
     this.gas = gas;
@@ -50,7 +51,7 @@ class Car {
     var safe_distance;
 
     if (next_car) {
-      distance_to_car = next_car.distance - this.distance - next_car.length - 20;
+      distance_to_car = next_car.distance - this.distance - next_car.length - 10;
       safe_distance = 2 * mph_to_fps(next_car.speed) + 5;
       near_car = safe_distance > distance_to_car || break_distance + 10 > distance_to_car;
     }
@@ -99,6 +100,11 @@ class Car {
                  '<br/> press=' + Math.floor(brake_pressure) +
                  '');
      */
+  }
+
+  destroy = function() {
+    this.el.remove();
+    this.el = null;
   }
 
   _compute_nexts = function() {
@@ -175,7 +181,7 @@ class StopLight {
 }
 
 function light(d) {
-  return new StopLight(d, 10, 30);
+  return new StopLight(d, 30, 30);
 }
 
 class SpeedLimit {
@@ -197,6 +203,13 @@ function speed_limit(d, limit) {
   return new SpeedLimit(d, limit);
 }
 
+var stats = {'current': {'num': 0, 'avg': 0.0}};
+
+function update_stats(t) {
+  var d = stats.current;
+  d.avg = ((d.avg * d.num) + t) / (d.num + 1)
+  d.num++;
+}
 
 function tick() {
   // tick lights
@@ -209,10 +222,15 @@ function tick() {
     // calculate the new speed and distance for each car
     car.tick(idx);
     plot(car);
+
+    if (car.distance > total_distance) {
+      update_stats(ticks - car.start_tick);
+      car.destroy()
+    }
   });
 
   // remove all cars that have finished.
-  lane = _.filter(lane, function(car) { return (car.distance < total_distance); });
+  lane = _.filter(lane, function(car) { return (car.el); });
 
   if (!lane.length) {
     stop();
@@ -220,12 +238,16 @@ function tick() {
 
   var first_car = _.last(lane)
   if (first_car.distance > 100) {
-    if (Math.random() < 0.1) {
+    if (Math.random() < 0.2) {
       add_car();
     }
   }
 
-  $('#ticks').html(ticks);
+  $('#ticks').html(
+    'ticks=' + ticks +
+    ' num=' + stats.current.num +
+    ' avg=' + stats.current.avg);
+
   ticks++;
   //console.log('tick=' + ticks);
 }
@@ -246,19 +268,17 @@ function init() {
   if (initialized) return;
 
   lights = [
-    light(300),
-    light(500),
-    light(900),
-    light(1800),
+    light(200),
+    light(1500),
     light(2600),
   ];
 
   speed_limits = [
     speed_limit(0, 70),
-    speed_limit(400, 50),
-    speed_limit(1100, 35),
-    speed_limit(2500, 40),
-    speed_limit(3100, 55),
+    speed_limit(800, 50),
+    speed_limit(1700, 35),
+    speed_limit(3000, 40),
+    speed_limit(4000, 55),
   ];
 
   _.each(lights.concat(speed_limits), function(i) { plot(i)});
