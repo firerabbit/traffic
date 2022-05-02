@@ -25,12 +25,14 @@ class Car {
     this.speed_limit = speed_limits[0];
     this.next_light = lights[0]
     this.next_limit = speed_limits[1];
+    this.text = '';
 
     // associate this class with a jquery el
     var el = $('#car').clone();
     el.attr('id', '');
     el.appendTo('#canvas');
     this.el = el;
+    this.text_el = el.children();
   };
 
   tick = function(idx) {
@@ -63,22 +65,22 @@ class Car {
         brake_pressure = break_distance / distance_to_car;
         this.speed = Math.max(next_car.speed, this.speed - (brake_pressure * this.brake));
       }
-      text = 'car'
+      this.text = 'car'
     } else if (near_red_light) {
       // come to a stop in time for the light
       distance_to_light = this.next_light.distance - this.distance;
       brake_pressure = break_distance / distance_to_light;
       this.speed = Math.max(0, this.speed - (brake_pressure * this.brake));
-      text = 'red';
+      this.text = 'red';
     } else {
       // start matching speed to the speed limit
       var limit = this.speed_limit.speed_limit;
       if (this.speed > limit) {
         this.speed = Math.max(limit, this.speed - this.brake);
-        text = 'brake';
+        this.text = 'brake';
       } else {
         this.speed = Math.min(limit, this.speed + this.gas);
-        text = 'gas';
+        this.text = 'gas';
       }
     }
 
@@ -93,7 +95,7 @@ class Car {
     this.distance += mph_to_fps(this.speed);
 
 
-    this.el.html(text + '<br/>' + Math.floor(this.speed));
+    this.render();
     /*
     this.el.html(text +
                  '<br/> speed=' + Math.floor(this.speed) +
@@ -104,9 +106,14 @@ class Car {
      */
   }
 
+  render = function() {
+    this.text_el.html(this.text + '<br/>' + Math.floor(this.speed));
+  }
+
   destroy = function() {
     this.el.remove();
     this.el = null;
+    this.text_el = null;
   }
 
   _compute_nexts = function() {
@@ -300,7 +307,7 @@ function replot() {
 }
 
 function start() {
-  if (lane.length) { console.log("already started"); return; }
+  if (interval_id) { console.log("already started"); return; }
   init();
   add_car();
   interval_id = setInterval(tick, 100)
@@ -308,6 +315,7 @@ function start() {
 
 function stop() {
   clearInterval(interval_id);
+  interval_id = null;
   console.log("Stopped!");
 }
 
@@ -316,14 +324,27 @@ function plot(item) {
   var x = (item.distance % line_width) / line_width; // 0 - 1
   var line = Math.floor(item.distance / line_width); // 0 - 5
   var y = line / lines; // 0 - 1
-  if (line % 2) {
-    x = 1 - x;
-    item.el.addClass('flip');
-  } else {
-    item.el.removeClass('flip');
-  }
+  var flipped = line % 2;
+  if (flipped) { x = 1 - x; }
   item.el.css('left', x * 100  + '%');
   item.el.css('top', (y * 100 + 10) + '%');
+
+  // only manipulate dom when it changes
+  if (flipped == item.flipped) return;
+
+  if (flipped) {
+    item.el.addClass('flip');
+    if (item.text_el) {
+      item.text_el.addClass('flip');
+    }
+  } else {
+    item.el.removeClass('flip');
+    if (item.text_el) {
+      item.text_el.removeClass('flip');
+    }
+  }
+
+  item.flipped = flipped;
 }
 
 
