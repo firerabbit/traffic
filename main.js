@@ -210,6 +210,11 @@ function speed_limit(d, limit) {
 
 var stats = {'current': {'num': 0, 'avg': 0.0}};
 
+function reset_stats() {
+  stats.num = 0;
+  stats.avg = 0.0;
+}
+
 function update_stats(t) {
   var d = stats.current;
   d.avg = ((d.avg * d.num) + t) / (d.num + 1)
