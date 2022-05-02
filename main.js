@@ -1,5 +1,5 @@
 
-var total_distance = 3100;
+var total_distance = 4000;
 var lines = 5;
 var line_width = total_distance / lines;
 var lane = [];
@@ -274,16 +274,16 @@ function init() {
 
   lights = [
     light(400),
-    light(1500),
-    light(2600),
+    light(2000),
+    light(3100),
   ];
 
   speed_limits = [
     speed_limit(0, 70),
     speed_limit(600, 50),
-    speed_limit(1700, 35),
-    speed_limit(3000, 40),
-    speed_limit(4000, 55),
+    speed_limit(2200, 35),
+    speed_limit(3500, 40),
+    speed_limit(4500, 55),
   ];
 
   replot();
