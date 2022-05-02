@@ -214,6 +214,13 @@ function tick() {
     stop();
   }
 
+  var first_car = _.last(lane)
+  if (first_car.distance > 100) {
+    if (Math.random() < 0.1) {
+      add_car();
+    }
+  }
+
   $('#ticks').html(ticks);
   ticks++;
   //console.log('tick=' + ticks);
@@ -235,7 +242,6 @@ function init() {
   if (initialized) return;
 
   lights = [
-    light(100),
     light(300),
     light(500),
     light(900),
