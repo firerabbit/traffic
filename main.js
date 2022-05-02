@@ -2,7 +2,7 @@
 var total_distance = 5000;
 var lines = 5;
 var line_width = total_distance / lines;
-var lanes = [];
+var lane = [];
 var lights;
 var speed_limits;
 
@@ -41,9 +41,27 @@ class Car {
     var break_distance = mph_to_fps(this.speed / 2) * ticks_to_break;
     var near_red_light = (
       this.next_light && this.next_light.is_red() &&
-      break_distance + this.distance + 10 > this.next_light.distance)
+      break_distance + this.distance + 10 > this.next_light.distance
+    )
 
-    if (near_red_light) {
+    var next_car = lane[idx - 1];
+    var near_car = false;
+    var distance_to_car;
+    var safe_distance;
+
+    if (next_car) {
+      distance_to_car = next_car.distance - this.distance - next_car.length;
+      safe_distance = 2 * mph_to_fps(next_car.speed) + 5;
+      near_car = safe_distance < distance_to_car || break_distance + 10 > distance_to_car;
+    }
+
+    if (near_car) {
+      if (this.speed > next_car.speed) {
+        brake_pressure = break_distance / distance_to_car;
+        this.speed = Math.max(next_car.speed, this.speed - (brake_pressure * this.brake));
+      }
+      text = 'car'
+    } else if (near_red_light) {
       // come to a stop in time for the light
       distance_to_light = this.next_light.distance - this.distance;
       brake_pressure = break_distance / distance_to_light;
@@ -70,8 +88,9 @@ class Car {
 
     // update distance based on speed
     this.distance += mph_to_fps(this.speed);
+
     this.el.html(text +
-                 '<br/> speed=' + this.speed +
+                 '<br/> speed=' + Math.floor(this.speed) +
                  '<br/> break=' + Math.floor(break_distance) +
                  '<br/> light=' + Math.floor(distance_to_light) +
                  '<br/> press=' + Math.floor(brake_pressure)
@@ -84,22 +103,12 @@ class Car {
       this.speed_limit = this.next_limit;
       this.next_limit = speed_limits[next_idx]
       var next_idx = this.speed_limit_idx+1
-      if (next_idx >= speed_limits.length) {
-        this.next_limit = null
-      } else {
-        this.next_limit = speed_limits[next_idx]
-        console.log("new limit!")
-      }
+      this.next_limit = speed_limits[next_idx];
     }
 
     if (this.next_light && this.distance > this.next_light.distance) {
       this.traffic_light_idx++;
-      if (this.traffic_light_idx >= lights.length) {
-        this.next_light = null
-      } else {
-        this.next_light = lights[this.traffic_light_idx]
-        console.log("new light!")
-      }
+      this.next_light = lights[this.traffic_light_idx]
     }
   }
 
@@ -192,16 +201,16 @@ function tick() {
   })
 
   // tick cars
-  _.each(lanes, function(car, idx) {
+  _.each(lane, function(car, idx) {
     // calculate the new speed and distance for each car
     car.tick(idx);
     plot(car);
   });
 
   // remove all cars that have finished.
-  lanes = _.filter(lanes, function(car) { return (car.distance < total_distance); });
+  lane = _.filter(lane, function(car) { return (car.distance < total_distance); });
 
-  if (!lanes.length) {
+  if (!lane.length) {
     stop();
   }
 
@@ -215,7 +224,7 @@ var interval_id = null;
 
 function add_car() {
   var c = car(10);
-  lanes.push(c);
+  lane.push(c);
   plot(c);
   return c;
 }
@@ -238,14 +247,14 @@ function init() {
     speed_limit(400, 50),
     speed_limit(1100, 35),
     speed_limit(2500, 40),
-    speed_limit(3000, 55),
+    speed_limit(3100, 55),
   ];
 
   _.each(lights.concat(speed_limits), function(i) { plot(i)});
 }
 
 function start() {
-  if (lanes.length) { console.log("already started"); return; }
+  if (lane.length) { console.log("already started"); return; }
   init();
   add_car();
   interval_id = setInterval(tick, 500)

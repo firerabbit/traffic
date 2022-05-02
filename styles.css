@@ -43,8 +43,9 @@ body {
 #canvas {
   background-color: #eee;
   opacity: 0.5;
-  width: 100%;
-  height: 100%;
   position: fixed;
-  top: 0px;
+  left: 20px;
+  right: 20px;
+  top: 40px;
+  bottom: 0px;
 }
