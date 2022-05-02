@@ -37,9 +37,13 @@ class Car {
     this.text_el = el.children();
 
     // Give each car some random destination
-    if (Math.random() < 0.1) {
-      this.destination = destinations[0];
-      this.el.css('background-color', this.destination.color);
+    var bucket = Math.random()
+    for (var i=0; i<destinations.length; i++) {
+      if (bucket < destinations[i].weight) {
+        this.destination = destinations[i];
+        this.el.css('background-color', this.destination.color);
+        break;
+      }
     }
   };
 
@@ -76,7 +80,8 @@ class Car {
     }
 
     if (near_dest) {
-      var speed_to_slow = this.speed - this.destination.entry_speed;
+      var entry_speed = this.destination.entry_speed;
+      var speed_to_slow = Math.max(entry_speed, this.speed - entry_speed);
       var exit_ticks_to_break = speed_to_slow / this.brake;
       var avg_speed = (speed_to_slow / 2) + this.destination.entry_speed;
       var break_distance = mph_to_fps(avg_speed) * exit_ticks_to_break;
@@ -247,10 +252,11 @@ function speed_limit(d, limit) {
 }
 
 class Destination {
-  constructor(name, distance, duration) {
+  constructor(name, distance, duration, weight) {
     this.name = name;
     this.distance = distance;
     this.duration = duration;
+    this.weight = weight;
     this.entry_speed = 1;
     this.color = 'blue';
 
@@ -267,8 +273,8 @@ class Destination {
   }
 }
 
-function destination(name, distance, duration) {
-  return new Destination(name, distance, duration);
+function destination(name, distance, duration, weight) {
+  return new Destination(name, distance, duration, weight);
 }
 
 var stats = {'current': {'num': 0, 'avg': 0.0}};
@@ -355,7 +361,7 @@ function init() {
   ];
 
   destinations = [
-    destination('stripes', 1200, 300),
+    destination('stripes', 1200, 300, 0.5),
   ]
 
   replot();
