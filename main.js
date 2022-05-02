@@ -281,7 +281,12 @@ function plot(item) {
   var x = (item.distance % line_width) / line_width; // 0 - 1
   var line = Math.floor(item.distance / line_width); // 0 - 5
   var y = line / lines; // 0 - 1
-  if (line % 2) { x = 1 - x; }
+  if (line % 2) {
+    x = 1 - x;
+    item.el.addClass('flip');
+  } else {
+    item.el.removeClass('flip');
+  }
   item.el.css('left', x * 100  + '%');
   item.el.css('top', (y * 100 + 10) + '%');
 }

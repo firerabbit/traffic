@@ -27,6 +27,10 @@ body {
   transform: translate(-20px, 0px);
 }
 
+.flip {
+  transform: scaleX(-1);
+}
+
 .light {
   width: 20px;
   height: 20px;
