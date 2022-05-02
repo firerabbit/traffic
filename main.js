@@ -251,8 +251,8 @@ class Destination {
     this.name = name;
     this.distance = distance;
     this.duration = duration;
-    this.entry_speed = 15;
-    this.color = 'yellow';
+    this.entry_speed = 1;
+    this.color = 'blue';
 
     // associate this class with a jquery el
     var el = $('#destination').clone();
