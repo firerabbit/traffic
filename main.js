@@ -331,6 +331,7 @@ function tick() {
 
   ticks++;
   //console.log('tick=' + ticks);
+  interval_id = setTimeout(tick, MS)
 }
 
 var ticks = 0;
@@ -346,7 +347,8 @@ function add_car() {
 var initialized = false;
 
 function init() {
-  if (initialized) return;
+  if (initialized) { console.log('already init'); return; };
+  initialized = true;
 
   lights = [
     light(400),
@@ -363,9 +365,10 @@ function init() {
   ];
 
   destinations = [
-    destination('stripes', 1500, 300, 0.5),
+    destination('stripes', 1500, 300, 0.2),
   ]
 
+  add_car();
   replot();
 }
 
@@ -374,11 +377,15 @@ function replot() {
   _.each(speed_limits, function(i) { i.render(); });
 }
 
-function start() {
-  if (interval_id) { console.log("already started"); return; }
-  init();
-  add_car();
-  interval_id = setInterval(tick, 100)
+MS = 100
+
+function start(ms) {
+  if (interval_id) { clearInterval(interval_id); }
+  if (!initialized) { init(); }
+  MS = ms || MS
+  let sec = (MS) / 1000;
+  document.styleSheets[0].rules[0].style.transition = `all ${sec}s linear 0s`
+  interval_id = setTimeout(tick, MS)
 }
 
 function stop() {
