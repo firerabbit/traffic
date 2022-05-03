@@ -384,7 +384,13 @@ function start(ms) {
   if (!initialized) { init(); }
   MS = ms || MS
   let sec = (MS) / 1000;
-  document.styleSheets[0].rules[0].style.transition = `all ${sec}s linear 0s`
+
+  try {
+    document.styleSheets[0].rules[0].style.transition = `all ${sec}s linear 0s`
+  } catch {
+    console.log("Failed to set animation CSS");
+  }
+
   interval_id = setTimeout(tick, MS)
 }
 
