@@ -265,11 +265,13 @@ class Destination {
     el.attr('id', '');
     el.appendTo('#canvas');
     this.el = el;
+    this.el.css('background-color', this.color);
+    this.text_el = el.children();
     this.render();
   }
 
   render = function() {
-    this.el.html(this.name);
+    this.text_el.html(this.name);
   }
 }
 

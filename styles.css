@@ -50,6 +50,12 @@ body {
   transform: translate(-12px, -55px);
 }
 
+.destination {
+  padding: 10px;
+  border: black 1px solid;
+  color: white;
+}
+
 #canvas {
   position: fixed;
   left: 20px;
