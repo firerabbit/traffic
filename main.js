@@ -170,7 +170,7 @@ class Car {
 }
 
 function car(speed) {
-  speed = speed || 70;
+  speed = speed || 70;  // default to 70mph
   return new Car(speed, 2, 4);
 }
 
@@ -317,6 +317,7 @@ function tick() {
     stop();
   }
 
+  // always add in a new car if there's room
   var first_car = _.last(lane)
   if (first_car.distance > 100) {
     if (Math.random() < TRAFFIC) {
@@ -324,10 +325,16 @@ function tick() {
     }
   }
 
+  // Change traffic density over time
+  if (ticks % 20 == 0) {
+    TRAFFIC = Math.random();
+  }
+
   $('#ticks').html(
-    'ticks=' + ticks +
-    ' num=' + stats.current.num +
-    ' avg=' + Math.floor(stats.current.avg));
+    ' traffic=' + TRAFFIC.toFixed(2) +
+    '   ticks=' + ticks +
+    '     num=' + stats.current.num +
+    '     avg=' + Math.floor(stats.current.avg));
 
   ticks++;
   //console.log('tick=' + ticks);
@@ -338,7 +345,7 @@ var ticks = 0;
 var interval_id = null;
 
 function add_car() {
-  var c = car(10);
+  var c = car();
   lane.push(c);
   plot(c);
   return c;
@@ -377,7 +384,7 @@ function replot() {
   _.each(speed_limits, function(i) { i.render(); });
 }
 
-MS = 100
+MS = 100;
 
 function start(ms) {
   if (interval_id) { clearInterval(interval_id); }
