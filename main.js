@@ -171,7 +171,7 @@ class Car {
 
 function car(speed) {
   speed = speed || 70;  // default to 70mph
-  return new Car(speed, 2, 4);
+  return new Car(speed, 5, 4);
 }
 
 GREEN = 1;
@@ -252,13 +252,13 @@ function speed_limit(d, limit) {
 }
 
 class Destination {
-  constructor(name, distance, duration, weight) {
+  constructor(name, distance, duration, weight, color) {
     this.name = name;
     this.distance = distance;
     this.duration = duration;
     this.weight = weight;
     this.entry_speed = 10;
-    this.color = 'blue';
+    this.color = color;
 
     // associate this class with a jquery el
     var el = $('#destination').clone();
@@ -275,8 +275,8 @@ class Destination {
   }
 }
 
-function destination(name, distance, duration, weight) {
-  return new Destination(name, distance, duration, weight);
+function destination(name, distance, duration, weight, color) {
+  return new Destination(name, distance, duration, weight, color);
 }
 
 var stats = {'current': {'num': 0, 'avg': 0.0}};
@@ -340,7 +340,7 @@ function tick() {
 
   ticks++;
   //console.log('tick=' + ticks);
-  interval_id = setTimeout(tick, MS)
+  if (interval_id) { interval_id = setTimeout(tick, MS)}
 }
 
 var ticks = 0;
@@ -366,15 +366,17 @@ function init() {
   ];
 
   speed_limits = [
-    speed_limit(0, 70),
-    speed_limit(600, 50),
+    speed_limit(0, 60),
+    speed_limit(500, 50),
     speed_limit(2200, 35),
     speed_limit(3500, 40),
     speed_limit(4500, 55),
   ];
 
   destinations = [
-    destination('stripes', 1500, 300, 0.2),
+    destination('TSC', 1200, 300, 0.1, 'darkblue'),
+    destination('stripes', 1300, 300, 0.2, 'blue'),
+    destination('sonic', 1500, 300, 0.3, 'lightblue'),
   ]
 
   add_car();
